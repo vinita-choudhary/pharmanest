@@ -9,7 +9,10 @@ const abstractSchema = new Schema({
   designation: { type: String },
   title: { type: String },
   subject: { type: String },
-  abstractFileUrl: { type: String },
+  abstractFileUrl: { type: String }, // For file-based submissions
+  abstractText: { type: String }, // For text-based submissions
+  keywords: { type: String }, // Add keywords field
+  mobile: { type: String }, // Add mobile field
   address: { type: String },
   city: { type: String },
   state: { type: String },
