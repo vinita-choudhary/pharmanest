@@ -12,10 +12,50 @@ import { subjectOptions } from "./subjectOptions";
 export default function AbstractFormPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(true);
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsFormSubmitted(true);
+    setIsSubmitting(true);
+
+    try {
+      // Get form data
+      const formData = new FormData(e.target as HTMLFormElement);
+      
+      const submitData = {
+        title: formData.get('title') as string,
+        specialization: formData.get('specialization') as string,
+        authorName: formData.get('author-name') as string,
+        authorEmail: formData.get('author-email') as string,
+        affiliation: formData.get('affiliation') as string,
+        mobile: formData.get('mobile') as string,
+        isWhatsApp: formData.get('isWhatsApp') === 'on',
+        coAuthors: formData.get('co-authors') as string,
+        keywords: formData.get('keywords') as string,
+        abstractText: formData.get('abstract-text') as string,
+      };
+
+      const response = await fetch('/api/submitTextAbstract', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(submitData),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setIsFormSubmitted(true);
+      } else {
+        alert(result.message || 'Failed to submit abstract');
+      }
+    } catch (error) {
+      console.error('Error submitting abstract:', error);
+      alert('Failed to submit abstract. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -210,6 +250,7 @@ export default function AbstractFormPage() {
                   <input
                     type="text"
                     id="title"
+                    name="title"
                     required
                     className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:border-[#00FFCC] focus:ring-1 focus:ring-[#00FFCC] focus:outline-none backdrop-blur-sm"
                     placeholder="Enter the title of your abstract"
@@ -226,6 +267,7 @@ export default function AbstractFormPage() {
                   </label>
                   <select
                     id="specialization"
+                    name="specialization"
                     required
                     className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:border-[#00FFCC] focus:ring-1 focus:ring-[#00FFCC] focus:outline-none backdrop-blur-sm"
                   >
@@ -255,6 +297,7 @@ export default function AbstractFormPage() {
                   <input
                     type="text"
                     id="author-name"
+                    name="author-name"
                     required
                     className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:border-[#00FFCC] focus:ring-1 focus:ring-[#00FFCC] focus:outline-none backdrop-blur-sm"
                     placeholder="Enter your full name"
@@ -272,6 +315,7 @@ export default function AbstractFormPage() {
                   <input
                     type="email"
                     id="author-email"
+                    name="author-email"
                     required
                     className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:border-[#00FFCC] focus:ring-1 focus:ring-[#00FFCC] focus:outline-none backdrop-blur-sm"
                     placeholder="Enter your email address"
@@ -289,6 +333,7 @@ export default function AbstractFormPage() {
                   <input
                     type="text"
                     id="affiliation"
+                    name="affiliation"
                     required
                     className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:border-[#00FFCC] focus:ring-1 focus:ring-[#00FFCC] focus:outline-none backdrop-blur-sm"
                     placeholder="Enter your institution or affiliation"
@@ -305,6 +350,7 @@ export default function AbstractFormPage() {
                   <input
                     type="tel"
                     id="mobile"
+                    name="mobile"
                     required
                     className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:border-[#00FFCC] focus:ring-1 focus:ring-[#00FFCC] focus:outline-none backdrop-blur-sm"
                     placeholder="Enter your mobile number"
@@ -316,6 +362,7 @@ export default function AbstractFormPage() {
                     <input
                       type="checkbox"
                       id="isWhatsApp"
+                      name="isWhatsApp"
                       className="h-5 w-5 rounded border-gray-300 text-[#00FFCC] focus:ring-[#00FFCC]"
                     />
                     <label
@@ -338,6 +385,7 @@ export default function AbstractFormPage() {
                 <input
                   type="text"
                   id="co-authors"
+                  name="co-authors"
                   className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:border-[#00FFCC] focus:ring-1 focus:ring-[#00FFCC] focus:outline-none backdrop-blur-sm"
                   placeholder="Format: Name (Affiliation), Name (Affiliation)"
                 />
@@ -353,6 +401,7 @@ export default function AbstractFormPage() {
                 <input
                   type="text"
                   id="keywords"
+                  name="keywords"
                   required
                   className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:border-[#00FFCC] focus:ring-1 focus:ring-[#00FFCC] focus:outline-none backdrop-blur-sm"
                   placeholder="3-5 keywords separated by commas"
@@ -368,6 +417,7 @@ export default function AbstractFormPage() {
                 </label>
                 <textarea
                   id="abstract-text"
+                  name="abstract-text"
                   required
                   rows={10}
                   className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:border-[#00FFCC] focus:ring-1 focus:ring-[#00FFCC] focus:outline-none backdrop-blur-sm"
@@ -382,6 +432,7 @@ export default function AbstractFormPage() {
                 <label className="flex items-center space-x-2">
                   <input
                     type="checkbox"
+                    name="confirmation"
                     required
                     className="rounded border-white/20 text-[#00CCFF] focus:ring-[#00CCFF]"
                   />
@@ -396,9 +447,14 @@ export default function AbstractFormPage() {
               <div className="mt-8">
                 <button
                   type="submit"
-                  className="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-[#00FFCC] to-[#00CCFF] rounded-full text-[#070B39] font-bold text-lg hover:shadow-[0_0_30px_rgba(0,204,255,0.5)] transition-all duration-300"
+                  disabled={isSubmitting}
+                  className={`w-full md:w-auto px-8 py-4 rounded-full font-bold text-lg transition-all duration-300 ${
+                    isSubmitting
+                      ? 'bg-gray-500 cursor-not-allowed'
+                      : 'bg-gradient-to-r from-[#00FFCC] to-[#00CCFF] hover:shadow-[0_0_30px_rgba(0,204,255,0.5)]'
+                  } text-[#070B39]`}
                 >
-                  Submit Abstract
+                  {isSubmitting ? 'Submitting...' : 'Submit Abstract'}
                 </button>
               </div>
             </form>
